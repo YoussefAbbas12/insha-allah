@@ -1,0 +1,204 @@
+==============================================
+LearnHub API Documentation
+==============================================
+
+This document describes the API endpoints that the LearnHub application expects.
+Currently, the application uses a local JSON file (src/data/courses.json) for data.
+
+When you're ready to connect to a real backend API, implement these endpoints:
+
+----------------------------------------------
+1. GET /api/courses
+----------------------------------------------
+Description: Get all courses with optional filtering and sorting
+Query Parameters:
+  - search (string, optional): Search in title, description, and instructor name
+  - category (string, optional): Filter by category name
+  - level (string, optional): Filter by level (Beginner, Intermediate, Advanced)
+  - minPrice (number, optional): Minimum price filter
+  - maxPrice (number, optional): Maximum price filter
+  - minRating (number, optional): Minimum rating filter (1-5)
+  - sortBy (string, optional): Sort by (popular, rating, price-low, price-high, newest)
+
+Response Format:
+{
+  "courses": [Course[]],
+  "total": number
+}
+
+Example:
+GET /api/courses?category=Development&sortBy=popular&minRating=4.5
+
+----------------------------------------------
+2. GET /api/courses/:slug
+----------------------------------------------
+Description: Get a single course by slug
+Parameters:
+  - slug (string): The course slug/identifier
+
+Response Format:
+{
+  Course object
+}
+
+Example:
+GET /api/courses/complete-web-development-bootcamp
+
+----------------------------------------------
+3. GET /api/categories
+----------------------------------------------
+Description: Get all course categories with course counts
+
+Response Format:
+{
+  "categories": [Category[]]
+}
+
+----------------------------------------------
+4. GET /api/featured
+----------------------------------------------
+Description: Get featured courses (bestsellers and new courses)
+Query Parameters:
+  - limit (number, optional): Maximum number of courses to return (default: 4)
+
+Response Format:
+{
+  "courses": [Course[]]
+}
+
+----------------------------------------------
+5. GET /api/stats
+----------------------------------------------
+Description: Get platform statistics
+
+Response Format:
+{
+  "totalCourses": number,
+  "totalStudents": number,
+  "totalInstructors": number,
+  "averageRating": string
+}
+
+==============================================
+Data Types
+==============================================
+
+Course {
+  id: string
+  title: string
+  slug: string
+  description: string
+  shortDescription: string
+  price: number
+  originalPrice: number
+  currency: string
+  rating: number
+  reviewCount: number
+  studentCount: number
+  thumbnail: string (URL)
+  category: string
+  level: string (Beginner | Intermediate | Advanced)
+  duration: string
+  language: string
+  lastUpdated: string
+  isBestseller: boolean
+  isNew: boolean
+  instructor: Instructor
+  curriculum: CurriculumSection[]
+  reviews: Review[]
+  whatYouWillLearn: string[]
+}
+
+Instructor {
+  id: string
+  name: string
+  title: string
+  bio: string
+  avatar: string (URL)
+  rating: number
+  studentCount: number
+  courseCount: number
+}
+
+CurriculumSection {
+  sectionTitle: string
+  lectures: Lecture[]
+}
+
+Lecture {
+  title: string
+  duration: string
+  isPreview: boolean
+  videoUrl?: string (YouTube URL)
+}
+
+Review {
+  id: string
+  userName: string
+  userAvatar: string (URL)
+  rating: number (1-5)
+  date: string (YYYY-MM-DD)
+  comment: string
+}
+
+Category {
+  id: string
+  name: string
+  icon: string
+  courseCount: number
+}
+
+==============================================
+Authentication Endpoints (Future Implementation)
+==============================================
+
+POST /api/auth/register
+Body: { email, password, name }
+Response: { user, token }
+
+POST /api/auth/login
+Body: { email, password }
+Response: { user, token }
+
+GET /api/auth/me
+Headers: Authorization: Bearer {token}
+Response: { user }
+
+POST /api/auth/logout
+Headers: Authorization: Bearer {token}
+Response: { success: true }
+
+==============================================
+User & Purchase Endpoints (Future Implementation)
+==============================================
+
+GET /api/user/profile
+Headers: Authorization: Bearer {token}
+Response: { user with purchasedCourses[] }
+
+POST /api/user/purchase
+Headers: Authorization: Bearer {token}
+Body: { courseId }
+Response: { success, newBalance, course }
+
+GET /api/user/cart
+Headers: Authorization: Bearer {token}
+Response: { cart: CartItem[] }
+
+POST /api/user/cart/add
+Headers: Authorization: Bearer {token}
+Body: { courseId }
+Response: { cart }
+
+DELETE /api/user/cart/remove/:courseId
+Headers: Authorization: Bearer {token}
+Response: { cart }
+
+==============================================
+Base URL
+==============================================
+When implementing the backend API, use:
+Production: https://your-api-domain.com
+Development: http://localhost:3000
+
+Note: Currently the app uses local JSON data from src/data/courses.json
